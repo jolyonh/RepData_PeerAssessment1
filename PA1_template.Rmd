@@ -1,147 +1,25 @@
-Reproducible Research Peer Assessment 01
-========================================================
-
-Load the plyr library
-
-```{r}
-library(plyr)
-library(lattice)
-```
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
-Loading and pre-processing the data
--
-
-1 Load the data
-
-```{r "read in the data"}
-rawData <- read.csv("activity.csv", header=TRUE)
-```
-
-2 Process/transform the data (if necessary) into a format suitable for your analysis
-
-Not required in my opinion
+## Loading and preprocessing the data
 
 
 
-What is mean total number of steps taken per day?
--
-
-1 Calculate the total number of steps taken per day
-
-```{r "Sum of stepscper day"}
-sumOfSteps <- ddply(rawData,~date, summarise, sum=sum(steps))
-```
-
-2 Make a histogram of the total number of steps taken each day
-
-```{r "Plot of steps taken per day"}
-hist(sumOfSteps$sum, 
-     breaks=20,
-     main="Histogram of steps taken each day",
-     xlab="Number of steps",
-     ylim=c(0,20), 
-     xlim=c(0,25000))
-```
-
-3 Calculate and report the mean and median of the total number of steps taken per day
-
-
-```{r "Mean of steps"}
-meanOfSteps <- ddply(rawData,~date, summarise, steps=mean(steps))
-```
-
-Mean of Steps
-```{r echo=FALSE}
-ddply(rawData,~date, summarise, steps=mean(steps))
-```
-
-```{r "Median of steps"}
-medianOfSteps <- ddply(rawData,~date, summarise, steps=median(steps))
-```
-
-Median of Steps
-```{r echo=FALSE}
-ddply(rawData,~date, summarise, steps=median(steps))
-```
-
-What is the average daily activity pattern?
--
-
-1 Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-
-
-```{r}
-meanOfStepsNoNA <- ddply(na.omit(rawData),~interval, summarise, steps=mean(steps))
-plot(meanOfStepsNoNA$interval, meanOfStepsNoNA$steps, type="l")
-```
-
-2 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-
-```{r}
-tail(meanOfStepsNoNA[ order(meanOfStepsNoNA[,2]),], n=1)
-```
-
-Imputing missing values
--
-
-1 Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-
-```{r}
-count(rawData$steps==NA)
-```
-
-2 Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-
-```{r}
-medianOfStepsNoNA <- ddply(na.omit(rawData),~interval, summarise, steps=median(steps))
-plot(meanOfStepsNoNA$steps, type="l")
-lines(medianOfStepsNoNA$steps)
-```
-
-My strategy would be to replace with the mean value of that timepoint
-
-3 Create a new dataset that is equal to the original dataset but with the missing data filled in.
-
-```{r}
-cleanData <- rawData
-
-for (ii in 1:dim(rawData[1])){ 
-  if (is.na(rawData$steps[ii])){
-    int <- rawData$interval[ii]
-    cleanData$steps[ii] <- round(meanOfStepsNoNA[meanOfStepsNoNA$interval==int,]$steps)
-  }
-}
-```
-
-4 Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from  the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
-
-```{r}
-sumOfCleanedSteps <- ddply(cleanData,~date, summarise, sum=sum(steps))
-
-hist(sumOfCleanedSteps$sum, 
-     breaks=20, 
-     main="Histogram of cleaned steps taken each day",
-     xlab="Number of steps",
-     ylim=c(0,20), 
-     xlim=c(0,25000))
-
-meanOfCleanedSteps <- ddply(cleanData,~date, summarise, steps=mean(steps))
-ddply(cleanData,~date, summarise, steps=mean(steps))
-medianOfCleanedSteps <- ddply(cleanData,~date, summarise, steps=median(steps))
-ddply(cleanData,~date, summarise, steps=median(steps))
-```
-
-Are there differences in activity patterns between weekdays and weekends?
--
-
-```{r}
-cleanData$DoW <- ifelse( weekdays(as.Date(cleanData$date)) == "Saturday"| weekdays(as.Date(cleanData$date)) =="Sunday" , "weekend" , "weekday" )
-
-tmp <- ddply(cleanData,~interval*DoW, summarise, steps=mean(steps))
-
-xyplot(tmp$steps~tmp$interval | as.factor(tmp$DoW), type="l", layout=c(1,2))
-```
+## What is mean total number of steps taken per day?
 
 
 
+## What is the average daily activity pattern?
+
+
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
