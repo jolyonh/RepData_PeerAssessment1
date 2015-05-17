@@ -29,7 +29,7 @@ What is mean total number of steps taken per day?
 
 1 Calculate the total number of steps taken per day
 
-```{r "Sum of stepscper day"}
+```{r "Sum of steps per day"}
 sumOfSteps <- ddply(rawData,~date, summarise, sum=sum(steps))
 ```
 
@@ -71,7 +71,7 @@ What is the average daily activity pattern?
 1 Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 
-```{r}
+```{r "Mean of Steps without NA"}
 meanOfStepsNoNA <- ddply(na.omit(rawData),~interval, summarise, steps=mean(steps))
 plot(meanOfStepsNoNA$interval, meanOfStepsNoNA$steps, type="l")
 ```
@@ -93,7 +93,7 @@ count(rawData$steps==NA)
 
 2 Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
-```{r}
+```{r "Plot with NA replacement"}
 medianOfStepsNoNA <- ddply(na.omit(rawData),~interval, summarise, steps=median(steps))
 plot(meanOfStepsNoNA$steps, type="l")
 lines(medianOfStepsNoNA$steps)
@@ -106,7 +106,7 @@ My strategy would be to replace with the mean value of that timepoint
 ```{r}
 cleanData <- rawData
 
-for (ii in 1:dim(rawData[1])){ 
+for (ii in 1:dim(rawData)[1]){ 
   if (is.na(rawData$steps[ii])){
     int <- rawData$interval[ii]
     cleanData$steps[ii] <- round(meanOfStepsNoNA[meanOfStepsNoNA$interval==int,]$steps)
@@ -116,7 +116,7 @@ for (ii in 1:dim(rawData[1])){
 
 4 Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from  the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r}
+```{r "Histogram of Steps per Day from cleaned data"}
 sumOfCleanedSteps <- ddply(cleanData,~date, summarise, sum=sum(steps))
 
 hist(sumOfCleanedSteps$sum, 
@@ -133,9 +133,10 @@ ddply(cleanData,~date, summarise, steps=median(steps))
 ```
 
 Are there differences in activity patterns between weekdays and weekends?
+Yes, the graphs show a slight difference in the pattern of steps.
 -
 
-```{r}
+```{r "Plot comparing Weekend & Weekday step patterns"}
 cleanData$DoW <- ifelse( weekdays(as.Date(cleanData$date)) == "Saturday"| weekdays(as.Date(cleanData$date)) =="Sunday" , "weekend" , "weekday" )
 
 tmp <- ddply(cleanData,~interval*DoW, summarise, steps=mean(steps))

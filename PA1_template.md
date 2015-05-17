@@ -209,7 +209,7 @@ meanOfStepsNoNA <- ddply(na.omit(rawData),~interval, summarise, steps=mean(steps
 plot(meanOfStepsNoNA$interval, meanOfStepsNoNA$steps, type="l")
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
+![plot of chunk Mean of Steps without NA](figure/Mean of Steps without NA-1.png) 
 
 2 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -247,7 +247,7 @@ plot(meanOfStepsNoNA$steps, type="l")
 lines(medianOfStepsNoNA$steps)
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
+![plot of chunk Plot with NA replacement](figure/Plot with NA replacement-1.png) 
 
 My strategy would be to replace with the mean value of that timepoint
 
@@ -257,17 +257,12 @@ My strategy would be to replace with the mean value of that timepoint
 ```r
 cleanData <- rawData
 
-for (ii in 1:dim(rawData[1])){ 
+for (ii in 1:dim(rawData)[1]){ 
   if (is.na(rawData$steps[ii])){
     int <- rawData$interval[ii]
     cleanData$steps[ii] <- round(meanOfStepsNoNA[meanOfStepsNoNA$interval==int,]$steps)
   }
 }
-```
-
-```
-## Warning in 1:dim(rawData[1]): numerical expression has 2 elements: only
-## the first used
 ```
 
 4 Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from  the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
@@ -284,7 +279,7 @@ hist(sumOfCleanedSteps$sum,
      xlim=c(0,25000))
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+![plot of chunk Histogram of Steps per Day from cleaned data](figure/Histogram of Steps per Day from cleaned data-1.png) 
 
 ```r
 meanOfCleanedSteps <- ddply(cleanData,~date, summarise, steps=mean(steps))
@@ -427,6 +422,7 @@ ddply(cleanData,~date, summarise, steps=median(steps))
 ```
 
 Are there differences in activity patterns between weekdays and weekends?
+Yes, the graphs show a slight difference in the pattern of steps.
 -
 
 
@@ -438,7 +434,7 @@ tmp <- ddply(cleanData,~interval*DoW, summarise, steps=mean(steps))
 xyplot(tmp$steps~tmp$interval | as.factor(tmp$DoW), type="l", layout=c(1,2))
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png) 
+![plot of chunk Plot comparing Weekend & Weekday step patterns](figure/Plot comparing Weekend & Weekday step patterns-1.png) 
 
 
 
