@@ -18,8 +18,8 @@ Loading and pre-processing the data
 
 
 ```r
-download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", "activity.zip", mode="wb")
-unzip("activity.zip")
+#download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", "activity.zip", mode="wb")
+#unzip("activity.zip")
 rawData <- read.csv("activity.csv", header=TRUE)
 ```
 
