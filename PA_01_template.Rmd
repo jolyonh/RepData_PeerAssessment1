@@ -5,6 +5,7 @@ Load the plyr library
 
 ```{r}
 library(plyr)
+library(dplyr)
 library(lattice)
 ```
 
@@ -15,6 +16,8 @@ Loading and pre-processing the data
 1 Load the data
 
 ```{r "read in the data"}
+#download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", "activity.zip", mode="wb")
+#unzip("activity.zip")
 rawData <- read.csv("activity.csv", header=TRUE)
 ```
 
@@ -25,18 +28,25 @@ Not required in my opinion
 
 
 What is mean total number of steps taken per day?
--
+
 
 1 Calculate the total number of steps taken per day
 
 ```{r "Sum of steps per day"}
 sumOfSteps <- ddply(rawData,~date, summarise, sum=sum(steps))
 ```
+Load the dplyr library for data manipulations
+
+```{r, warning=TRUE, message=FALSE}
+library("dplyr")
+sumOfDailySteps <- summarise(group_by(rawData, date), sum=sum(steps))
+```
+
 
 2 Make a histogram of the total number of steps taken each day
 
 ```{r "Plot of steps taken per day"}
-hist(sumOfSteps$sum, 
+hist(sumOfDailySteps$sum, 
      breaks=20,
      main="Histogram of steps taken each day",
      xlab="Number of steps",
@@ -47,23 +57,16 @@ hist(sumOfSteps$sum,
 3 Calculate and report the mean and median of the total number of steps taken per day
 
 
-```{r "Mean of steps"}
-meanOfSteps <- ddply(rawData,~date, summarise, steps=mean(steps))
+```{r}
+meanOfSteps <- mean(sumOfDailySteps$sum, na.rm=T)
+
+medianOfSteps <- median(sumOfDailySteps$sum, na.rm=T)
 ```
 
-Mean of Steps
-```{r echo=FALSE}
-ddply(rawData,~date, summarise, steps=mean(steps))
-```
+**Mean of steps:** `r I(format(meanOfSteps, digits=7))`
 
-```{r "Median of steps"}
-medianOfSteps <- ddply(rawData,~date, summarise, steps=median(steps))
-```
+**Median of steps:** `r I(format(medianOfSteps, digits=7))`
 
-Median of Steps
-```{r echo=FALSE}
-ddply(rawData,~date, summarise, steps=median(steps))
-```
 
 What is the average daily activity pattern?
 -
@@ -88,7 +91,7 @@ Imputing missing values
 1 Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
 ```{r}
-count(rawData$steps==NA)
+summary(rawData$steps==NA)
 ```
 
 2 Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
